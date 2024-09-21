@@ -1,0 +1,37 @@
+return {
+  "SmiteshP/nvim-navbuddy",
+  dependencies = {
+    "SmiteshP/nvim-navic",
+    opts = function(_, opts)
+      opts.icons = {
+        File = " ",
+        Module = " ",
+        Namespace = " ",
+        Package = " ",
+        Class = " ",
+        Method = " ",
+        Property = " ",
+        Field = " ",
+        Constructor = " ",
+        Enum = " ",
+        Interface = " ",
+        Function = " ",
+        Variable = " ",
+        Constant = " ",
+        String = " ",
+        Number = " ",
+        Boolean = " ",
+        Array = " ",
+        Object = " ",
+        Key = " ",
+        Null = " ",
+        EnumMember = " ",
+        Struct = " ",
+        Event = " ",
+        Operator = " ",
+        TypeParameter = " ",
+      }
+    end,
+  },
+  opts = { lsp = { auto_attach = true } },
+}
