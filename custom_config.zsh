@@ -2,73 +2,19 @@
 export MANPAGER='nvim +Man! -c "set laststatus=0"'
 export BAT_THEME="ansi"
 
-# =================================== Fzf config ===================================
-
-local HEADER_MSG="--preview-window :hidden --bind '?:change-preview-window(right|down|right,70%|hidden)' --color header:italic --header 'Press ? to toggle'"
-local prev_win_opts="--preview-window :hidden --bind '?:change-preview-window(right|down|right,70%|hidden)' --color header:italic --header 'Press ? enable/toggle b/w preview modes'"
-# paths to ignore in addition to ~/.ignore
-local -a x_paths=("~/local-repo")
-local xcludes=""
-for xpath in $x_paths; do
-  xcludes="$xcludes --exclude '$xpath' "
-done
-
-export FZF_COMPLETION_TRIGGER='**'
-export FZF_DEFAULT_OPTS="-1 -0  --height 50% --tmux bottom,50% --layout=reverse --border top " # Starts fzf in lower half of the screen taking 40% height
-export FZF_DEFAULT_COMMAND="fd --type file --follow . $xcludes"
-# export FZF_DEFAULT_COMMAND="fd --type file --follow . --exclude '*.pyc' --exclude '*.pyi' --exclude '.vscode'"
-export FZF_CTRL_R_OPTS=""
-
-export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-export FZF_CTRL_T_OPTS="--preview 'bat --style=full --color always {}' $prev_win_opts"
-
-export FZF_ALT_C_COMMAND="fd --type directory --follow --exclude '.git' ."
-export FZF_ALT_C_OPTS="--preview 'tree -C {}' $prev_win_opts"
-
-export FZF_COMPLETION_TRIGGER="**"
-_fzf_compgen_path() {
-  fd --follow --exclude ".git" . "$1"
-}
-
-# Use fd to generate the list for directory completion
-_fzf_compgen_dir() {
-  fd --type d --follow --exclude ".git" . "$1"
-}
-
-# fuzzy searching functions
-
-function frg() {
-  #!/usr/bin/env bash
-
-  # Switch between Ripgrep launcher mode (CTRL-R) and fzf filtering mode (CTRL-F)
-  rm -f /tmp/rg-fzf-{r,f}
-  RG_PREFIX="rg --column --line-number --no-heading --color=always --smart-case "
-  INITIAL_QUERY="${*:-}"
-  fzf --ansi --disabled --query "$INITIAL_QUERY" \
-    --bind "start:reload($RG_PREFIX {q})+unbind(ctrl-r)" \
-    --bind "change:reload:sleep 0.1; $RG_PREFIX {q} || true" \
-    --bind "ctrl-f:unbind(change,ctrl-f)+change-prompt(2. fzf> )+enable-search+rebind(ctrl-r)+transform-query(echo {q} > /tmp/rg-fzf-r; cat /tmp/rg-fzf-f)" \
-    --bind "ctrl-r:unbind(ctrl-r)+change-prompt(1. ripgrep> )+disable-search+reload($RG_PREFIX {q} || true)+rebind(change,ctrl-f)+transform-query(echo {q} > /tmp/rg-fzf-f; cat /tmp/rg-fzf-r)" \
-    --color "hl:-1:underline,hl+:-1:underline:reverse" \
-    --prompt '1. ripgrep> ' \
-    --delimiter : \
-    --header '╱ CTRL-R (ripgrep mode) ╱ CTRL-F (fzf mode) ╱' \
-    --preview 'bat --color=always {1} --highlight-line {2}' \
-    --preview-window 'up,60%,border-bottom,+{2}+3/3,~3' \
-    --bind 'enter:become(vim {1} +{2})'
-}
-
 #  =================================== Functions ===================================
+source $HOME/fzf_config.zsh
 
 get_hidden_files() {
   if [[ $1 == "long" ]]; then
+    local params=('--git' '--group' '--group-directories-first' '--time-style=long-iso' '--color-scale=all' '--icons' '--header')
     if [[ $2 ]]; then
       OLDDIR=$(pwd)
       cd $2
-      eza --group-directories-first -snew -dl .* 2>/dev/null
+      eza $params --group-directories-first -snew -dl .* 2>/dev/null
       cd $OLDDIR
     else
-      eza --group-directories-first -snew -dl .* 2>/dev/null
+      eza $params --group-directories-first -snew -dl .* 2>/dev/null
     fi
   else
     if [[ $1 ]]; then
@@ -82,12 +28,6 @@ get_hidden_files() {
 
   fi
 }
-
-# j() {
-#     [ $# -gt 0 ] && [ `fasd -d "$@" |wc -l` -gt 0 ] && fasd_cd -d "$@" && return
-#     local dir
-#     dir="$(`echo $FZF_ALT_C_COMMAND` | fzf -1 -0 +m)" && $(fasd -A $dir) && cd "${dir}" || return 1
-# }
 
 debug_print() {
   if [[ "$DEBUG" -eq 1 ]]; then
@@ -103,7 +43,7 @@ manage_tmux_sessions() {
 
   header="Press enter to create new session if one doesn't exist with same name, delete to kill existing session\n"
   fzf_binds='enter:accept-or-print-query,delete:become(tmux kill-session -t {})'
-  fzf_cmd="fzf --height 50% --margin=10%,40%,10%,10% --reverse --border=rounded --border-label='Select session to manage'  --color=label:green:bold --color=border:green  --bind \"$fzf_binds\" --color=header:yellow:Italic --header \"$header\""
+  fzf_cmd="fzf  --height 50% --margin=10%,40%,10%,10% --reverse --border=rounded --border-label='Select session to manage'  --color=label:green:bold --color=border:green  --bind \"$fzf_binds\" --color=header:yellow:Italic --header \"$header\""
 
   inside_tmux() {
     if [[ -n "$1" ]]; then
@@ -151,20 +91,10 @@ manage_tmux_sessions() {
 }
 
 mx() {
-  # /bin/bash ~/.zsh/tmux-sessions.sh $@
-  manage_tmux_sessions $@
+  /bin/bash $HOME/tmux-sessions.sh $@
+  # manage_tmux_sessions $@
 }
 
-make_fasd_dir_jump() {
-  if [ $(fasd -d "$@" | wc -l) -gt 0 ]; then
-    debug_print "$@ matched to $(fasd -d "$@" | head)"
-    fasd_cd -d "$@"
-  else
-    debug_print "$@ not found it fasd"
-    local dir
-    dir="$($(echo $FZF_ALT_C_COMMAND) | fzf -1 -0 +m)" && $(fasd -A $dir) && cd "${dir}" || return 1
-  fi
-}
 
 cd_up() {
   # some comment
@@ -179,46 +109,6 @@ cd_up() {
   cd $path
 }
 
-# open FZF prompt fuzzy jump to directory
-ja() {
-  local dir
-  if [ -z "$1" ]; then
-    SRC_DIR=$HOME
-  else
-    SRC_DIR=$1
-  fi
-  dir="$(fd --type directory --hidden --follow . $SRC_DIR | fzf -1 -0 +m)" && $(fasd -A $dir) && cd "${dir}" || return 1
-}
-
-unalias j 2>/dev/null
-j() {
-  if [[ $# -eq 0 ]]; then
-    ja $PWD
-  elif [[ $1 && "$1" =~ "^\.+$" ]]; then
-    cd_up $1
-  else
-    make_fasd_dir_jump $@
-  fi
-}
-
-# open file with vim if its in FASD cache else open FZF and then add to FASD
-unalias v 2>/dev/null
-v() {
-  [ $# -gt 0 ] && [ $(fasd -f "$@" | wc -l) -gt 0 ] && file=$(fasd -f "$@" | head) && add_to_zsh_history "${EDITOR} ${file}" && ${EDITOR} "$file" && return
-  local file
-  file="$(fzf --select-1 --exit-0 +m)" && $(fasd -A $file) && add_to_zsh_history "${EDITOR} ${file}" && ${EDITOR} "${file}" || return 1
-}
-
-# same as ja but insted open file in vim
-va() {
-  local file
-  if [ -z "$1" ]; then
-    SRC_DIR=$HOME
-  else
-    SRC_DIR=$1
-  fi
-  file="$(fd --type file --hidden --follow . $SRC_DIR | fzf -1 -0 +m)" && $(fasd -A $file) && add_to_zsh_history "${EDITOR} ${file}" && ${EDITOR} "${file}" || return 1
-}
 
 gbf() {
   git checkout $(git branch | fzf | tr -d ‘[:space:]’)
@@ -227,17 +117,6 @@ gbf() {
 gbfa() {
   git checkout $(git branch --all | fzf | tr -d ‘[:space:]’)
 }
-
-# Interactively ripgrep through files and open then at exact line
-#ff() {
-#    local file
-#    local line
-#    read -r file line <<< `rg --vimgrep --line-number --hidden "$@" |awk -F':' '{print $1,$2}'|fzf -0 -1 --height 100% --preview="rg --colors 'match:fg:red' --ignore-case --pretty '$@' {1}"`
-#    if [[ -n $file ]]
-#    then
-#     vim $file +$line
-#    fi
-#}
 
 #  =================================== Aliases ===================================
 
@@ -258,16 +137,30 @@ alias rbld="rexec mint test"
 alias rcfg="rexec mint build-cfg"
 alias rundep="rexec mint undeploy"
 alias rdep="rexec mint deploy"
-alias cat='/opt/homebrew/bin/bat --color always'
+alias cat='bat --color always'
 
-alias ls='eza --group-directories-first -snew -F -I "*pyc*"'
-alias ll='ls  --icons -lg'
-alias lst='ls -T -L=3'
-alias lsd='ls -D'
-
-alias lsa='ls -a'
-alias lsh='get_hidden_files '
-alias llh='get_hidden_files long '
+# create folowing aliases only if eza is installed else use ls
+if [[ $(command -v eza) ]]; then
+  local eza_params=('--git' '--group' '--group-directories-first' '--time-style=long-iso' '--color-scale=all' '--icons')
+  alias ls='eza -I "*pyc*" $eza_params'
+  alias lsa='ls --all'
+  # alias l='ls --git-ignore'
+  # print tree format
+  alias lst='ls -T -L=3'
+  alias ll='ls --header --long --sort=modified'
+  alias l='ll'
+  alias lla='ll --all'
+  # sort by size
+  alias lS='ll --sort=size'
+  alias lSa='lla --sort=size'
+  alias llA='eza -lbhHigUmuSa'
+  alias lsd='ls -D'
+  alias lsf='ls -F'
+  alias llf='ll -F'
+  alias lld='ll -D'
+  alias lsh='get_hidden_files '
+  alias llh='get_hidden_files long '
+fi
 
 alias grep='rg'
 alias dud='du -d 1 -hc 2> /dev/null | grep -Ev "\.$"|sort -h'
@@ -279,7 +172,7 @@ alias ssh='ssh '
 alias xx='exit'
 alias ee='$EDITOR ~/.zshrc'
 alias c='clear'
-alias r='source ~/.zshrc'
+alias r='exec zsh'
 alias cp='cp -av'
 alias md='mkdir'
 alias hg="h | rg"
@@ -328,8 +221,28 @@ alias vrel='vagrant reload'
 
 alias dk=docker
 alias dkc=docker-compose
-alias .='j .'
-alias ..='j ..'
-alias ...='j ...'
-alias ....='j .....'
-alias .....='j .....'
+alias .='z .'
+alias ..='z ..'
+alias ...='z ...'
+alias ....='z .....'
+alias .....='z .....'
+alias zz='z -'
+
+
+local function za() {
+local src_dir
+[[ $# -eq 0 ]] && src_dir=$PWD || src_dir=$@
+debug_print $src_dir
+dir="$(eval $find_dirs_cmd $src_dir | fzf -1 -0 +m)" && cd "${dir}" || return 1
+}
+
+
+v() {
+  local file
+  if [[ $# -gt 0 ]]; then
+    nvim $@
+  else
+    files="$(eval $find_files_cmd $PWD | fzf --select-1 --exit-0 +m)" && nvim "${files}" || return 1
+      fi
+  
+}
