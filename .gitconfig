@@ -4,7 +4,8 @@
 [alias]
     a = add
     # Checkout shortcuts
-    co = checkout -b
+    co = checkout
+    cb = checkout -b
     com = checkout master
     # commit commands
     cm = commit -a

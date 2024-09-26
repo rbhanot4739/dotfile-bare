@@ -1,7 +1,6 @@
 
 # =================================== Fzf config ===================================
 
-# local HEADER_MSG="--preview-window :hidden --bind '?:change-preview-window(right|down|right,70%|hidden)' --header-first --header 'Press ? to toggle'"
 local prev_win_opts="--preview-window :hidden --bind '?:change-preview-window(right|down|right,70%|hidden)' --header-first --header 'Press ? enable/toggle b/w preview modes'"
 # paths to ignore in addition to ~/.ignore
 local -a x_paths=("~/local-repo")
@@ -13,7 +12,8 @@ local find_all_cmd="fd --follow . $xcludes "
 local find_files_cmd="$find_all_cmd --type file "
 local find_dirs_cmd="$find_all_cmd --type directory "
 
-export FZF_DEFAULT_OPTS=" -1 -0 --height 50% --tmux center,70%,60% --layout=reverse --border rounded --multi '--bind=shift-tab:up,tab:down,ctrl-space:toggle' " # Starts fzf in lower half of the screen taking 40% height
+local fzf_colors="--color=bg+:#313244,bg:#1e1e2e,spinner:#f5e0dc,hl:#f38ba8 --color=fg:#cdd6f4,header:#f38ba8,info:#cba6f7,pointer:#f5e0dc --color=marker:#b4befe,fg+:#cdd6f4,prompt:#cba6f7,hl+:#f38ba8 --color=selected-bg:#45475a"
+export FZF_DEFAULT_OPTS=" --height 70% --tmux center,90%,60% --layout=reverse --border rounded --multi '--bind=shift-tab:up,tab:down,ctrl-space:toggle' $fzf_colors" # Starts fzf in lower half of the screen taking 40% height
 
 # if [[ $TMUX ]]; then
 #   export FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS --tmux bottom,50%"
@@ -38,6 +38,19 @@ _fzf_compgen_path() {
 _fzf_compgen_dir() {
   fd --type d --follow --exclude ".git" . "$1"
 }
+
+fzf_all() {
+local find_all_cmd="fd --follow . $xcludes "
+local find_files_cmd="$find_all_cmd --type file "
+local find_dirs_cmd="$find_all_cmd --type directory "
+
+ eval "$find_files_cmd" | fzf --prompt 'Files > ' --header 'CTRL-T: Switch between Files/Directories' --bind "ctrl-t:transform:[[ ! \$FZF_PROMPT =~ Files ]] &&
+    echo 'change-prompt(Files > )+reload($find_files_cmd)' ||
+    echo 'change-prompt(Directories > )+reload($find_dirs_cmd)'" --preview '[[ $FZF_PROMPT =~ Files ]] && bat --color=always {} || eza -T -L=2 --color=always {}'
+}
+zle -N fzf_all
+bindkey '^F' fzf_all
+
 
 # fuzzy searching functions
 

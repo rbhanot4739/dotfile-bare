@@ -26,7 +26,7 @@ return {
         defer_save = { "InsertLeave", "TextChanged" }, -- vim events that trigger a deferred save (saves after `debounce_delay`)
         cancel_defered_save = { "InsertEnter" }, -- vim events that cancel a pending deferred save
       },
-      debounce_delay = 2000,
+      debounce_delay = 5000,
       execution_message = {
         enabled = true,
         message = function() -- message to print on save
@@ -37,9 +37,17 @@ return {
       },
     },
   },
+  -- {
+  --   "chrisgrieser/nvim-spider",
+  --   keys = {
+  --     -- { mode = { "n", "o", "x" }, "cw", "c<cmd>lua require('spider').motion('e')<CR>", { desc = "Spider-ce" } },
+  --     { mode = { "n", "o", "x" }, "w", "<cmd>lua require('spider').motion('w')<CR>", { desc = "Spider-w" } },
+  --     { mode = { "n", "o", "x" }, "e", "<cmd>lua require('spider').motion('e')<CR>", { desc = "Spider-e" } },
+  --     { mode = { "n", "o", "x" }, "b", "<cmd>lua require('spider').motion('b')<CR>", { desc = "Spider-b" } },
+  --   },
+  -- },
   {
     "karb94/neoscroll.nvim",
-    event = "VeryLazy",
     opts = {
       easing = "cube",
     },

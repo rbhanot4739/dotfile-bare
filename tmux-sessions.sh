@@ -25,7 +25,7 @@ inside_tmux() {
 }
 
 outside_tmux() {
-  local fzf_cmd="fzf --margin=10%,40%,10%,10%  $fzf_opts"
+  local fzf_cmd="fzf -1 -0 --margin=10%,40%,10%,10%  $fzf_opts"
   local session_name=""
   if [[ -n "$1" ]]; then
     # if an argument is supplied try attaching to that session if exists else create a new one but do NOT attach to it

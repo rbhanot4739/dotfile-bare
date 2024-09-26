@@ -12,15 +12,14 @@ return {
       local line, col = unpack(vim.api.nvim_win_get_cursor(0))
       return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
     end
-    local cmp = require("cmp")
 
     -- insert copilot completions after lsp
-    -- table.remove(opts.sources, 1)
-    -- table.insert(opts.sources, { name = "copilot",
-    --   group_index = 2,
-    --   priority = 100,
-    -- })
-
+    table.remove(opts.sources, 1)
+    table.insert(opts.sources, { name = "copilot",
+      group_index = 2,
+      priority = 100,
+    })
+    local cmp = require("cmp")
     -- --------------------------------------cmdline setup start-----------------------------------------------------------------------------------------------------
     -- `/` cmdline setup.
     cmp.setup.cmdline("/", {

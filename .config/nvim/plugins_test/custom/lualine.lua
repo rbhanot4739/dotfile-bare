@@ -22,13 +22,7 @@ return {
         },
       },
       lualine_y = {
-        {
-          LazyVim.lualine.pretty_path(),
-          cond = function()
-            local excluded_fts = { "dashboard", "alpha", "ministarter", "toggleterm" }
-            return not vim.tbl_contains(excluded_fts, vim.bo.filetype)
-          end,
-        },
+        LazyVim.lualine.pretty_path(),
       },
       lualine_z = {
         function()

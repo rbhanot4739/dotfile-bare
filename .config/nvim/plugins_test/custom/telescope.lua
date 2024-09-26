@@ -57,9 +57,9 @@ return {
       -- mode = { "n", "v" },
       desc = "Live grep (Root Dir)",
     },
-    { "<leader>sm", "<cmd>Telescope harpoon marks<cr>", desc = "Search Harpoon marks" },
-    { "<leader>sM", "<cmd>Telescope marks<cr>", desc = "Search Vim marks" },
-    { "<space><space>", "<cmd>Telescope buffers<cr>", desc = "Search open buffers" },
+    { "<leader>sm", "<cmd>Telescope harpoon marks<cr>", desc = "Opoen Harpoon marks" },
+    { "<leader>sM", "<cmd>Telescope marks<cr>", desc = "Opoen Harpoon marks" },
+    { "<space><space>", "<cmd>Telescope buffers<cr>", desc = "Opoen Harpoon marks" },
     {
       "<leader>fr",
       function()

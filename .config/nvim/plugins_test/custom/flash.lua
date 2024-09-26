@@ -4,8 +4,6 @@ return {
     jump = { autojump = true }, -- automatically jump when there is only one match
     modes = {
       char = {
-        -- move with fF and tT instead of ; n ,
-        keys = { "f", "F", "t", "T" },
         -- add labels to fF and tT commands
         jump_labels = true,
       },
@@ -37,7 +35,7 @@ return {
       desc = "Treesitter Search",
     },
     {
-      ",,",
+      "**",
       mode = "n",
       function()
         require("flash").jump({ continue = true })
@@ -45,7 +43,7 @@ return {
       desc = "Flash: Continue last search keyword under cursor",
     },
     {
-      ",",
+      "*",
       mode = { "n" },
       function()
         require("flash").jump({ pattern = vim.fn.expand("<cword>") })

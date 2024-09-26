@@ -1,3 +1,4 @@
+typeset -g POWERLEVEL9K_INSTANT_PROMPT=quiet
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
@@ -58,6 +59,9 @@ zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -T -L=3 --color=always $realpat
 zstyle ':fzf-tab:*' switch-group '<' '>'
 zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'ls --color $realpath'
 # zstyle ':fzf-tab:*' fzf-command ftb-tmux-popup
+# custom fzf flags
+# NOTE: fzf-tab does not follow FZF_DEFAULT_OPTS
+zstyle ':fzf-tab:*' fzf-flags --height ~40% --color=fg:1,fg+:2
 
 # Change cursor shape to beam
 echo -ne '\e[5 q'
@@ -72,12 +76,11 @@ bindkey '^[[B' history-substring-search-down
 
 export LANG=en_US.UTF-8
 export LC_CTYPE=en_US.UTF-8
-export EDITOR=nvim
+[[ `command -v nvim` ]] && export EDITOR=nvim
 
 # needed specifically for Lazygit and more generically this makes configs more Linux compatible
 export XDG_CONFIG_HOME="$HOME/.config"
 # load custom aliases and functions
-[ -f "$HOME/custom_config.zsh" ] && source "$HOME/custom_config.zsh"
 
 
 # dotfiles management
@@ -95,4 +98,8 @@ eval "$(direnv hook zsh)"
 eval "$(zoxide init zsh)"
 alias zi=__zoxide_zi
 
+[ -f "$HOME/custom_config.zsh" ] && source "$HOME/custom_config.zsh"
 export PATH="$PATH:/Users/rbhanot/.local/bin:/Users/Shared/DBngin/mysql/8.0.19/bin"
+export VOLTA_HOME="$HOME/.volta"
+export PATH="$PATH:$HOME/.cargo/bin:$VOLTA_HOME/bin"
+

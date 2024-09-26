@@ -1,4 +1,5 @@
 # vim: set filetype=sh:
+
 export MANPAGER='nvim +Man! -c "set laststatus=0"'
 export BAT_THEME="ansi"
 
@@ -95,27 +96,27 @@ mx() {
   # manage_tmux_sessions $@
 }
 
-
 cd_up() {
   # some comment
 
   local num_dots=${#1}
-  # build a path like ../../../ using a loop based on num_dots
-  local path=""
+  # build a pth like ../../../ using a loop based on num_dots
+  local pth=""
   for ((i = 1; i <= num_dots; i++)); do
-    path="../$path"
+    pth="../$pth"
   done
-  debug_print "moving up by $num_dots directories to PATH $path"
-  cd $path
+  debug_print $(which cd)
+  debug_print "moving up by $num_dots directories to pth $pth"
+  cd $pth
 }
 
-
 gbf() {
-  git checkout $(git branch | fzf | tr -d ‘[:space:]’)
+  local branch=$(git branch | fzf --bind "enter:accept-or-print-query" | tr -d ' ')
+  git checkout $branch 2>/dev/null || git checkout -b $branch
 }
 
 gbfa() {
-  git checkout $(git branch --all | fzf | tr -d ‘[:space:]’)
+  git checkout $(git branch --all | fzf)
 }
 
 #  =================================== Aliases ===================================
@@ -137,7 +138,6 @@ alias rbld="rexec mint test"
 alias rcfg="rexec mint build-cfg"
 alias rundep="rexec mint undeploy"
 alias rdep="rexec mint deploy"
-alias cat='bat --color always'
 
 # create folowing aliases only if eza is installed else use ls
 if [[ $(command -v eza) ]]; then
@@ -162,12 +162,9 @@ if [[ $(command -v eza) ]]; then
   alias llh='get_hidden_files long '
 fi
 
-alias grep='rg'
+# some utility aliases
 alias dud='du -d 1 -hc 2> /dev/null | grep -Ev "\.$"|sort -h'
 alias h='history 0'
-
-alias vim='nvim'
-alias vi='nvim'
 alias ssh='ssh '
 alias xx='exit'
 alias ee='$EDITOR ~/.zshrc'
@@ -176,12 +173,26 @@ alias r='exec zsh'
 alias cp='cp -av'
 alias md='mkdir'
 alias hg="h | rg"
-alias mux="tmuxinator "
+alias wh='which '
+alias wich='which '
+[[ $(command -v nvim) ]] && alias vim='nvim'
+[[ $(command -v rg) ]] && alias grep='rg'
+[[ $(command -v tmuxinator) ]] && alias mux="tmuxinator "
+if [[ $(command -v eza) ]]; then
+  alias less='bat'
+  alias cat='bat --color always'
+fi
+if [[ $(command -v gh) ]]; then
+  alias ghc='gh copilot explain '
+  alias ghcs='gh copilot suggest '
+fi
 
 # git aliases
+alias lg='lazygit'
 alias g="git "
 alias ga='git add '
-alias gco='git checkout'
+alias gco='git co '
+alias gcb='git cb '
 alias gcom='git checkout master'
 alias gcm='git commit -a -m '
 alias gcma='git commit --amend '
@@ -221,28 +232,74 @@ alias vrel='vagrant reload'
 
 alias dk=docker
 alias dkc=docker-compose
-alias .='z .'
-alias ..='z ..'
-alias ...='z ...'
-alias ....='z .....'
-alias .....='z .....'
+alias .='cd_up .'
+alias ..='cd_up ..'
+alias ...='cd_up ...'
+alias ....='cd_up .....'
+alias .....='cd_up .....'
 alias zz='z -'
 
-
-local function za() {
-local src_dir
-[[ $# -eq 0 ]] && src_dir=$PWD || src_dir=$@
-debug_print $src_dir
-dir="$(eval $find_dirs_cmd $src_dir | fzf -1 -0 +m)" && cd "${dir}" || return 1
-}
-
+# local function za() {
+# local src_dir
+# [[ $# -eq 0 ]] && src_dir=$PWD || src_dir=$@
+# debug_print $src_dir
+# dir="$(eval $find_dirs_cmd $src_dir | fzf -1 -0 +m)" && cd "${dir}" || return 1
+# }
+#
 
 v() {
-  local file
+  # Opens files or directories using the default editor.
+  #
+  # If arguments are provided, it checks if they are files or directories.
+  # If all arguments are files, it opens them directly.
+  # If all arguments are directories, it uses `fd` to find files in those directories and then pipe it through to  `fzf` to select files
+  # If no arguments are provided, it uses `fzf` to select files from the current directory.
+  #
+  # Arguments:
+  #   $@ - List of files or directories to open.
+  #
+  # Returns:
+  #   0 if files are successfully opened, 1 otherwise.
+  #
+  # Example usage:
+  #   v file1.txt file2.txt
+  #   v /path/to/directory1 /path/to/directory2 /path/to/directory3 ...
+  #   v
+  #
+  # Note: The function uses:
+  #   - `fd` to find files
+  #   - `fzf` for fuzzy file selection.
+  #   - adds the opened files to the zsh history.
+  #  - opens the files using the default editor.
+  #
+
+  local selected_files
+
+  local all_dirs=true
+  local all_files=true
+
+  for arg in "$@"; do
+    if [[ -f "$arg" ]]; then
+      all_dirs=false
+    elif [[ -d "$arg" ]] || [[ -L "$arg" ]]; then
+      all_files=false
+    fi
+  done
+
   if [[ $# -gt 0 ]]; then
-    nvim $@
+    local args=$@
+    if $all_files; then
+      ${EDITOR} $@
+      return 0
+    elif $all_dirs; then
+      selected_files="$(eval $find_files_cmd $args | fzf --select-1 --exit-0 +m)"
+    else
+      echo "Arguments must of same type i.e. either all files or directories"
+      return 1
+    fi
   else
-    files="$(eval $find_files_cmd $PWD | fzf --select-1 --exit-0 +m)" && nvim "${files}" || return 1
-      fi
-  
+    selected_files="$(eval $find_files_cmd $PWD | fzf --select-1 --exit-0 +m)"
+  fi
+
+  [[ ! -z $selected_files ]] && echo $selected_files && add_to_zsh_history "${EDITOR} ${selected_files}" && ${EDITOR} "${selected_files}" || return 1
 }

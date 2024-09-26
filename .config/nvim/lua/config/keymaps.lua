@@ -19,8 +19,8 @@ if not vim.g.vscode then
   map("n", "]o", "o<Esc>", { desc = "add blank line below" })
   map("n", "[<Space>", "O<Esc>j", { desc = "add blank line above keeping cursor on original place" })
   map("n", "]<Space>", "o<Esc>k", { desc = "add blank line below keeping cursor on original line" })
-  map("n", "[p", "O<esc>pj", { desc = "paste above current line" })
-  map("n", "]p", "o<esc>pk", { desc = "paste below current line" })
+  -- map("n", "[p", "O<esc>pj", { desc = "paste above current line" })
+  -- map("n", "]p", "o<esc>pk", { desc = "paste below current line" })
 
   -- buffer movements
   map("n", "L", ":bnext<CR>")
@@ -50,16 +50,26 @@ if not vim.g.vscode then
   map("n", "<C-Right>", [[<cmd>lua require("tmux").resize_right()<cr>]], { desc = "Increase Window Width" })
 
   -- disable arrow  keys
-  map({ "n", "v", "i" }, "<Up>", "<Nop>", { desc = "disable arrow keys" })
-  map({ "n", "v", "i" }, "<Down>", "<Nop>", { desc = "disable arrow keys" })
-  map({ "n", "v", "i" }, "<Left>", "<Nop>", { desc = "disable arrow keys" })
-  map({ "n", "v", "i" }, "<Right>", "<Nop>", { desc = "disable arrow keys" })
+  -- map({ "n", "v", "i" }, "<Up>", "<Nop>", { desc = "disable arrow keys" })
+  -- map({ "n", "v", "i" }, "<Down>", "<Nop>", { desc = "disable arrow keys" })
+  -- map({ "n", "v", "i" }, "<Left>", "<Nop>", { desc = "disable arrow keys" })
+  -- map({ "n", "v", "i" }, "<Right>", "<Nop>", { desc = "disable arrow keys" })
 
   -- insert comment in insert mode
-  map("i", "", "<esc>Vcx<esc><cmd>normal gcc<cr>fxa<bs>", { desc = "add comment" })
+  -- map("i", "", "<esc>Vcx<esc><cmd>normal gcc<cr>fxa<bs>", { desc = "add comment" })
 
   -- operations on entire file
   map("n", "<leader>Y", ":%y<CR>", { desc = "copy entire file" })
   map("n", "<leader>D", ":%d<CR>", { desc = "delete entire file" })
   map("n", "<leader>V", "ggVG", { desc = "select entire file" })
+
+  -- delete lazyVim builtin keymaps
+  vim.keymap.del({ "n", "t" }, "<c-_>")
+  vim.keymap.del("n", "<leader>ft")
+  vim.keymap.del("n", "<leader>fT")
+  -- vim.keymap.del("n", "<A-n>")
+  -- add a mapping to replace visual selection in file
+  vim.keymap.set("v", "<leader>*", 'y:%s/\\V<c-r>"//g<left><left>', { desc = "replace visual selection" })
+  -- replace word under cursor
+  map({ "n" }, "<leader>*", ":%s/\\<<C-r><C-w>\\>//g<left><left>", { desc = "replace word under cursor" })
 end
