@@ -26,7 +26,8 @@ fzf_transform="--bind '?:transform:[[ ! \$FZF_PROMPT =~ Sessions ]] && \
         echo \"change-prompt(Sessions> )+reload(tmux list-sessions -F \\\"#{session_name}\\\")\" || \
         echo \"change-prompt(Tmuxinator Projects> )+reload(tmuxinator list | tail -n +2 | tr \\\" \\\" \\\"\\n\\\" | awk \\\"NF\\\")\"'"
 
-layout="--height 50% --layout=reverse --margin 15%,25%"
+layout=$([[ -n ${TMUX} ]] && echo "--tmux --layout=reverse" || echo "--height 50% --layout=reverse --margin 15%,25%")
+# fzf_cmd="fzf $info $border_label $color_label $color_border $header_first $header $color_header $binds $prompt $fzf_transform $layout"
 fzf_cmd="fzf $info $border_label $color_label $color_border $header_first $header $color_header $binds $prompt $fzf_transform $layout"
 
 tmux_attach_start() {

@@ -34,7 +34,7 @@ autoload -U colors && colors
 zinit light Aloxaf/fzf-tab
 
 # History
-HISTSIZE=10000
+HISTSIZE=100000
 HISTFILE=~/.zsh_history
 SAVEHIST=$HISTSIZE
 HISTDUP=erase
