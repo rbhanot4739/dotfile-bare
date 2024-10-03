@@ -7,3 +7,4 @@ vim.g.lazyvim_python_lsp = "basedpyright"
 vim.opt.spell = false
 vim.opt.spelllang = { "en_us" }
 vim.opt.laststatus = 3
+vim.o.sessionoptions = "blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions,skiprtp"

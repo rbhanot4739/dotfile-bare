@@ -9,11 +9,11 @@ return {
       },
     },
   },
-  {
-    -- auto add fstrings
-    "chrisgrieser/nvim-puppeteer",
-    ft = { "python" },
-  },
+  -- {
+  --   -- auto add fstrings
+  --   "chrisgrieser/nvim-puppeteer",
+  --   ft = { "python" },
+  -- },
   {
     "okuuva/auto-save.nvim",
 

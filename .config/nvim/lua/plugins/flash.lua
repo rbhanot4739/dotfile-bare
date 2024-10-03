@@ -4,7 +4,6 @@ return {
     jump = { autojump = true }, -- automatically jump when there is only one match
     modes = {
       char = {
-        -- move with fF and tT instead of ; n ,
         keys = { "f", "F", "t", "T" },
         -- add labels to fF and tT commands
         jump_labels = true,

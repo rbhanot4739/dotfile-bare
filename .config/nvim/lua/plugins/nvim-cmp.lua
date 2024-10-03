@@ -43,7 +43,8 @@ return {
         },
       }),
     })
-    -- --------------------------------------cmdline setup done-----------------------------------------------------------------------------------------------------
+    -- cmdline setup done
+
     -- dap repl completion
     opts.enabled = function()
       return vim.api.nvim_buf_get_option(0, "buftype") ~= "prompt" or require("cmp_dap").is_dap_buffer()
@@ -55,6 +56,8 @@ return {
         { name = "dap" },
       } })
     end
+    -- dap repl completion done
+
     -- table.insert(opts.sources, {
     --   name = "spell",
     --   option = {
@@ -78,8 +81,8 @@ return {
             vim.snippet.jump(1)
           end)
         elseif has_words_before() then
-          -- cmp.complete()
-          cmp.select_next_item({ behavior = cmp.SelectBehavior.Select })
+          cmp.complete()
+          -- cmp.select_next_item({ behavior = cmp.SelectBehavior.Select })
         else
           fallback()
         end
@@ -98,5 +101,22 @@ return {
       ["<C-j>"] = cmp.mapping.scroll_docs(-4),
       ["<C-k>"] = cmp.mapping.scroll_docs(4),
     })
+    -- opts.sorting = {
+    --   priority_weight = 2,
+    --   comparators = {
+    --     cmp.config.compare.exact,
+    --     require("copilot_cmp.comparators").prioritize,
+    --     -- Below is the default comparitor list and order for nvim-cmp
+    --     cmp.config.compare.offset,
+    --     -- cmp.config.compare.scopes, --this is commented in nvim-cmp too
+    --     cmp.config.compare.score,
+    --     cmp.config.compare.recently_used,
+    --     cmp.config.compare.locality,
+    --     cmp.config.compare.kind,
+    --     cmp.config.compare.sort_text,
+    --     cmp.config.compare.length,
+    --     cmp.config.compare.order,
+    --   },
+    -- }
   end,
 }

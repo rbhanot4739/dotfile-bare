@@ -1,4 +1,5 @@
-typeset -g POWERLEVEL9K_INSTANT_PROMPT=quiet
+# vim: ft=sh
+#
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
@@ -9,11 +10,12 @@ ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
 [ ! -d $ZINIT_HOME/.git ] && git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
 source "${ZINIT_HOME}/zinit.zsh"
 
-if [[ -f "/opt/homebrew/bin/brew" ]] then
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+if [[ -f "/opt/homebrew/bin/brew" ]]; then
   eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
 
-# setup prompt
 zinit ice depth=1; zinit light romkatv/powerlevel10k
 
 zinit light zdharma-continuum/fast-syntax-highlighting
@@ -21,16 +23,15 @@ zinit light zsh-users/zsh-completions
 zinit light zsh-users/zsh-autosuggestions
 zinit light zsh-users/zsh-history-substring-search
 
-zinit ice as"completion"
-zinit snippet $HOME/_rg
-
 autoload -Uz compinit && compinit
+# fpath=(~/zsh_functions $fpath);
+# export export FPATH=$FPATH
+# autoload -U $fpath[1]/*(.:t)
 
-zinit light Aloxaf/fzf-tab
 # Enable colors
 autoload -U colors && colors
 
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+zinit light Aloxaf/fzf-tab
 
 # History
 HISTSIZE=10000
@@ -51,7 +52,9 @@ setopt hist_save_no_dups # Do not save duplicate commands in the history
 setopt hist_find_no_dups # Do not display duplicate commands when searching the history
 
 # Completion styling
-zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
+zstyle ':completion:::::' completer _expand _complete _ignored _approximate
+# zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
+zstyle ':completion:*' matcher-list '' 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
 zstyle ':completion:*:descriptions' format '[%d]'
 zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
 zstyle ':completion:*' menu no
@@ -76,7 +79,7 @@ bindkey '^[[B' history-substring-search-down
 
 export LANG=en_US.UTF-8
 export LC_CTYPE=en_US.UTF-8
-[[ `command -v nvim` ]] && export EDITOR=nvim
+[[ $(command -v nvim) ]] && export EDITOR=nvim
 
 # needed specifically for Lazygit and more generically this makes configs more Linux compatible
 export XDG_CONFIG_HOME="$HOME/.config"
@@ -89,15 +92,15 @@ export XDG_CONFIG_HOME="$HOME/.config"
 # dconf config --local status.showUntrackedFiles no
 # echo "alias dconf='/usr/bin/git --git-dir=$HOME/dotfiles/ --work-tree=$HOME'" >> $HOME/.bashrc
 alias dconf='/usr/bin/git --git-dir=/Users/rbhanot/dotfiles/ --work-tree=$HOME'
-
 # load tools
 source ~/.temporal.zsh
 source <(fzf --zsh)
-# eval "$(fasd --init auto)"
 eval "$(direnv hook zsh)"
 eval "$(zoxide init zsh)"
 alias zi=__zoxide_zi
 
+
+[ -f "$HOME/fzf_config.zsh" ] && source "$HOME/"fzf_config.zsh
 [ -f "$HOME/custom_config.zsh" ] && source "$HOME/custom_config.zsh"
 export PATH="$PATH:/Users/rbhanot/.local/bin:/Users/Shared/DBngin/mysql/8.0.19/bin"
 export VOLTA_HOME="$HOME/.volta"

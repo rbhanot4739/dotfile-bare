@@ -1,4 +1,4 @@
-
+# vim: ft=sh
 # =================================== Fzf config ===================================
 
 local prev_win_opts="--preview-window :hidden --bind '?:change-preview-window(right|down|right,70%|hidden)' --header-first --header 'Press ? enable/toggle b/w preview modes'"
@@ -40,17 +40,16 @@ _fzf_compgen_dir() {
 }
 
 fzf_all() {
-local find_all_cmd="fd --follow . $xcludes "
-local find_files_cmd="$find_all_cmd --type file "
-local find_dirs_cmd="$find_all_cmd --type directory "
+  local find_all_cmd="fd --follow . $xcludes "
+  local find_files_cmd="$find_all_cmd --type file "
+  local find_dirs_cmd="$find_all_cmd --type directory "
 
- eval "$find_files_cmd" | fzf --prompt 'Files > ' --header 'CTRL-T: Switch between Files/Directories' --bind "ctrl-t:transform:[[ ! \$FZF_PROMPT =~ Files ]] &&
+  eval "$find_files_cmd" | fzf --prompt 'Files > ' --header '?: Switch between Files/Directories' --bind "?:transform:[[ ! \$FZF_PROMPT =~ Files ]] &&
     echo 'change-prompt(Files > )+reload($find_files_cmd)' ||
     echo 'change-prompt(Directories > )+reload($find_dirs_cmd)'" --preview '[[ $FZF_PROMPT =~ Files ]] && bat --color=always {} || eza -T -L=2 --color=always {}'
 }
 zle -N fzf_all
-bindkey '^F' fzf_all
-
+bindkey '^T' fzf_all
 
 # fuzzy searching functions
 
@@ -72,6 +71,61 @@ function frg() {
     --header '╱ CTRL-R (ripgrep mode) ╱ CTRL-F (fzf mode) ╱' \
     --preview 'bat --color=always {1} --highlight-line {2}' \
     --preview-window 'up,60%,border-bottom,+{2}+3/3,~3' \
-    --bind 'enter:become(vim {1} +{2})'
+    --bind 'enter:become($EDITOR {1} +{2})'
 }
 
+v() {
+  # Opens files or directories using the default editor.
+  #
+  # If arguments are provided, it checks if they are files or directories.
+  # If all arguments are files, it opens them directly.
+  # If all arguments are directories, it uses `fd` to find files in those directories and then pipe it through to  `fzf` to select files
+  # If no arguments are provided, it uses `fzf` to select files from the current directory.
+  #
+  # Arguments:
+  #   $@ - List of files or directories to open.
+  #
+  # Returns:
+  #   0 if files are successfully opened, 1 otherwise.
+  #
+  # Example usage:
+  #   v file1.txt file2.txt
+  #   v /path/to/directory1 /path/to/directory2 /path/to/directory3 ...
+  #   v
+  #
+  # Note: The function uses:
+  #   - `fd` to find files
+  #   - `fzf` for fuzzy file selection.
+  #   - adds the opened files to the zsh history.
+  #  - opens the files using the default editor.
+  #
+
+  local all_dirs=true
+  local all_files=true
+
+  for arg in "$@"; do
+    if [[ -f "$arg" ]]; then
+      all_dirs=false
+    elif [[ -d "$arg" ]] || [[ -L "$arg" ]]; then
+      all_files=false
+    fi
+  done
+
+  if [[ $# -gt 0 ]]; then
+    local args=$@
+    if $all_files; then
+      ${EDITOR} $@
+      return 0
+    elif $all_dirs; then
+      selected_files="$(eval $find_files_cmd $args | fzf --select-1 --exit-0 +m)"
+    else
+      echo "Arguments must of same type i.e. either all files or directories"
+      return 1
+    fi
+  else
+    # selected_files="$(eval $find_files_cmd $PWD | fzf --select-1 --exit-0 +m)"
+    selected_files="$(eval $find_files_cmd | fzf --select-1 --exit-0 +m)"
+  fi
+
+  [[ ! -z $selected_files ]] && echo $selected_files && add_to_zsh_history "${EDITOR} ${selected_files}" && ${EDITOR} "${selected_files}" || return 1
+}

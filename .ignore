@@ -1,5 +1,6 @@
 !.*ignore
 !.config/nvim
+!config/app
 .*/
 Library/
 Desktop/

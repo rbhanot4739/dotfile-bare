@@ -1,7 +1,7 @@
 # /Users/rbhanot/.config/tmuxinator/insoul.yml
 
 name: insoul-fe
-root: ~/development/work/multiproducts/liscm-server
+root: ~/development/work/multiproducts/liscm-server/liscm-server/
 
 # Optional tmux socket
 # socket_name: foo
@@ -54,8 +54,8 @@ windows:
       # 'before' represents legacy functionality and will be deprecated in a future release, in favour of 'after'
       # synchronize: after
       panes:
-        - cd liscm-server && ipython
-        - cd liscm-server && mint build
+        - ipython
+        - mint build && mint build-cfg -f dev
   - lazygit: lazygit
   - deployment:
       root: "/export/content/lid/apps/"

@@ -1,24 +1,41 @@
-local utils = require("utils")
-local project_root = utils.get_root_dir
+-- local themes = require("telescope.themes")
 
 return {
   "nvim-telescope/telescope.nvim",
   dependencies = {
     "nvim-lua/plenary.nvim",
     "debugloop/telescope-undo.nvim",
+    {
+      "danielfalk/smart-open.nvim",
+      branch = "0.2.x",
+      config = function()
+        require("telescope").load_extension("smart_open")
+      end,
+      dependencies = {
+        "kkharji/sqlite.lua",
+        { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
+      },
+    },
   },
   opts = function(_, opts)
     local actions = require("telescope.actions")
     opts.defaults = {
       path_display = {
-        shorten = { len = 3, exclude = { -3, -2, -1 } },
-        "filename_first",
+        "smart",
+        -- shorten = { len = 3, exclude = { -3, -2, -1 } },
+        -- "filename_first",
       },
       prompt_prefix = "🔍 ",
       file_ignore_patterns = { "static/", "docs/", "pages/" },
       -- preview = {
       --   filesize_limit = 0.1, -- MB
       -- },
+      dynamic_preview_title = true,
+      mappings = {
+        n = {
+          ["D"] = actions.delete_buffer,
+        },
+      },
     }
     opts.extensions = {
       undo = {
@@ -34,45 +51,57 @@ return {
     return opts
   end,
   keys = {
-    {
-      "<leader>su",
-      "<cmd>Telescope undo<cr>",
-      desc = "Search undo history",
-    },
-    -- custom keymaps to search in the project root(containing .git) and not lsp root
+    { "<leader>su", "<cmd>Telescope undo<cr>", desc = "Search undo history" },
+    -- custom keymaps to search in the git root(containing .git) and not lsp root
     {
       "<leader>sw",
       function()
-        require("telescope.builtin").grep_string({ cwd = project_root })
+        require("telescope.builtin").grep_string(
+          -- themes.get_ivy({
+          --   previewer = true,
+          -- }),
+          { cwd = require("utils").get_root_dir, additional_args = { "--follow" } }
+        )
       end,
       mode = { "n", "v" },
-      desc = "Grep word under cursor (Root Dir)",
+      desc = "Grep word under cursor (Git Root)",
     },
     {
       "<leader>sg",
       function()
-        -- require("telescope.builtin").live_grep({ cwd = project_root })
-        require("telescope.builtin").live_grep({ cwd = project_root, prompt_title = "Live Grep (Root dir)" })
+        require("telescope.builtin").live_grep({
+          cwd = require("utils").get_root_dir,
+          additional_args = { "--follow" },
+          prompt_title = "Live Grep (Git Root)",
+        })
       end,
       -- mode = { "n", "v" },
-      desc = "Live grep (Root Dir)",
+      desc = "Live grep (Git Root)",
     },
     { "<leader>sm", "<cmd>Telescope harpoon marks<cr>", desc = "Search Harpoon marks" },
     { "<leader>sM", "<cmd>Telescope marks<cr>", desc = "Search Vim marks" },
-    { "<space><space>", "<cmd>Telescope buffers<cr>", desc = "Search open buffers" },
+    -- { "<space><space>", "<cmd>Telescope buffers theme=dropdown<cr>", desc = "Search open buffers" },
+    {
+      "<space><space>",
+      function()
+        require("telescope").extensions.smart_open.smart_open({
+          cwd_only = true,
+          -- show_scores = true,
+          match_algorithm = "fzf",
+          open_buffer_indicators = { previous = "•", others = "∘" },
+        })
+      end,
+      desc = "Search open buffers",
+    },
     {
       "<leader>fr",
       function()
-        require("telescope.builtin").oldfiles({ cwd = project_root, prompt_title = "Recent Files (Root)" })
+        require("telescope.builtin").oldfiles({
+          cwd = require("utils").get_root_dir,
+          prompt_title = "Recent Files (Git Root)",
+        })
       end,
-      desc = "Find recent files (root)",
-    },
-    {
-      "<leader>ff",
-      function()
-        require("telescope.builtin").find_files({ cwd = project_root, prompt_title = "Find Files (Root)" })
-      end,
-      desc = "Find files (root)",
+      desc = "Find recent files (Git Root)",
     },
 
     -- git
@@ -114,11 +143,11 @@ return {
     { "zf", "<cmd>Telescope spell_suggest<cr>", desc = "Spell suggest" },
     { "<leader>/", "<cmd>Telescope search_history<cr>", desc = "Search history" },
     { "<leader>,", "<cmd>Telescope vim_options<cr>", desc = "Search Vim options" },
-    {
-      "<leader>FF",
-      function()
-        utils.recent_files_picker()
-      end,
-    },
+    -- {
+    --   "<leader>FF",
+    --   function()
+    --     utils.recent_files_picker()
+    --   end,
+    -- },
   },
 }

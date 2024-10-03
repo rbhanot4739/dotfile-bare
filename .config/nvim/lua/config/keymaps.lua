@@ -15,20 +15,16 @@ if not vim.g.vscode then
     end
   end
 
-  map("n", "[o", "O<Esc>", { desc = "add blank line above" })
-  map("n", "]o", "o<Esc>", { desc = "add blank line below" })
   map("n", "[<Space>", "O<Esc>j", { desc = "add blank line above keeping cursor on original place" })
   map("n", "]<Space>", "o<Esc>k", { desc = "add blank line below keeping cursor on original line" })
-  -- map("n", "[p", "O<esc>pj", { desc = "paste above current line" })
-  -- map("n", "]p", "o<esc>pk", { desc = "paste below current line" })
 
   -- buffer movements
-  map("n", "L", ":bnext<CR>")
-  map("n", "H", ":bprev<CR>")
+  -- map("n", "L", ":bnext<CR>")
+  -- map("n", "H", ":bprev<CR>")
 
   -- window management
-  map("n", "<leader>\\", ":vsp<CR>")
-  map("n", "<leader>-", ":sp<CR>")
+  -- map("n", "<leader>\\", ":vsp<CR>")
+  -- map("n", "<leader>-", ":sp<CR>")
 
   map("n", "$", "g$", { desc = "move with wrapped lines" })
   map("n", "^", "g^", { desc = "move with wrapped lines" })
@@ -55,19 +51,10 @@ if not vim.g.vscode then
   -- map({ "n", "v", "i" }, "<Left>", "<Nop>", { desc = "disable arrow keys" })
   -- map({ "n", "v", "i" }, "<Right>", "<Nop>", { desc = "disable arrow keys" })
 
-  -- insert comment in insert mode
-  -- map("i", "", "<esc>Vcx<esc><cmd>normal gcc<cr>fxa<bs>", { desc = "add comment" })
-
-  -- operations on entire file
-  map("n", "<leader>Y", ":%y<CR>", { desc = "copy entire file" })
-  map("n", "<leader>D", ":%d<CR>", { desc = "delete entire file" })
-  map("n", "<leader>V", "ggVG", { desc = "select entire file" })
-
   -- delete lazyVim builtin keymaps
-  vim.keymap.del({ "n", "t" }, "<c-_>")
-  vim.keymap.del("n", "<leader>ft")
-  vim.keymap.del("n", "<leader>fT")
-  -- vim.keymap.del("n", "<A-n>")
+  -- vim.keymap.del({ "n", "t" }, "<c-_>")
+  -- vim.keymap.del("n", "<leader>ft")
+  -- vim.keymap.del("n", "<leader>fT")
   -- add a mapping to replace visual selection in file
   vim.keymap.set("v", "<leader>*", 'y:%s/\\V<c-r>"//g<left><left>', { desc = "replace visual selection" })
   -- replace word under cursor

@@ -61,20 +61,20 @@ else
   outside_tmux $@
 fi
 
-manage_sess() {
-  local action=$1
-  local session_name=$2
-  echo "Action: $action, Session: $session_name"
-}
-
-sess() {
-
-  fzf_binds='enter:become(~/manage_session.sh attach {}),delete:become(~/manage_session.sh kill {})'
-  tmux_cmd="tmux list-sessions -F '#{session_name}'"
-  zoxide_cmd="zoxide query -ls | head -n 5"
-
-  tmux ls -F '#{session_name}' |
-    fzf --bind $fzf_binds --prompt 'Sessions> ' --header 'CTRL-T: Switch between Files/Directories' --bind 'ctrl-t:transform:[[ ! $FZF_PROMPT =~ Sessions ]] &&
-              echo "change-prompt(Sessions> )+reload(tmux list-sessions -F \"#{session_name}\")" ||
-              echo "change-prompt(zoxide> )+reload(zoxide query -l)"'
-}
+# manage_sess() {
+#   local action=$1
+#   local session_name=$2
+#   echo "Action: $action, Session: $session_name"
+# }
+#
+# sess() {
+#
+#   fzf_binds='enter:become(~/manage_session.sh attach {}),delete:become(~/manage_session.sh kill {})'
+#   tmux_cmd="tmux list-sessions -F '#{session_name}'"
+#   zoxide_cmd="zoxide query -ls | head -n 5"
+#
+#   tmux ls -F '#{session_name}' |
+#     fzf --bind $fzf_binds --prompt 'Sessions> ' --header 'CTRL-T: Switch between Files/Directories' --bind 'ctrl-t:transform:[[ ! $FZF_PROMPT =~ Sessions ]] &&
+#               echo "change-prompt(Sessions> )+reload(tmux list-sessions -F \"#{session_name}\")" ||
+#               echo "change-prompt(zoxide> )+reload(zoxide query -l)"'
+# }
