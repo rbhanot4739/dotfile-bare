@@ -32,6 +32,7 @@ fzf_cmd="fzf $info $border_label $color_label $color_border $header_first $heade
 
 tmux_attach_start() {
   local session="$1"
+  local mode="$2"
   local tmux_action=""
   tmux_action=$([[ -n ${TMUX} ]] && echo "switch-client" || echo "attach-session")
   local tmux_sessions="tmux list-sessions -F '#{session_name}' 2>/dev/null"
@@ -45,27 +46,31 @@ tmux_attach_start() {
     tmuxinator start "$session"
   else
     # its a new session that user has entered as query, so lets create and switch to it
-    echo -n "No existing session found with name $session. Do you want to create a new session? (Y/n): "
-    read -r response
-    if [[ "$response" =~ ^[Yy]$ ]]; then
-      tmux new-session -d -s "$1" && tmux "$tmux_action" -t "$session"
+    if [[ "$mode" == "term" ]]; then
+      echo -n "No existing session found with name $session. Do you want to create a new session? (Y/n): "
+      read -r response
+      if [[ "$response" =~ ^[Yy]$ ]]; then
+        tmux new-session -d -s "$1" && tmux "$tmux_action" -t "$session"
+      else
+        echo "Session creation aborted."
+      fi
     else
-      echo "Session creation aborted."
+      tmux new-session -d -s "$1" && tmux "$tmux_action" -t "$session"
     fi
 
   fi
 }
 
-inside_tmux() {
+handler_request() {
   local session=""
   if [[ -n "$1" ]]; then
-    tmux_attach_start "$1"
+    tmux_attach_start "$1" "term"
     return
   else
     sess_list=$(tmux list-sessions -F "#{session_name}" 2>/dev/null)
     session=$(echo -n -e "$sess_list" | eval "$fzf_cmd")
     if [[ -n $session ]]; then
-      tmux_attach_start "$session"
+      tmux_attach_start "$session" "fzf"
     fi
   fi
 }
@@ -75,4 +80,4 @@ if [[ $# -gt 1 ]]; then
   return
 fi
 
-inside_tmux "$@"
+handler_request "$@"

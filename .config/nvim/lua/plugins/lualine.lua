@@ -23,7 +23,10 @@ return {
       },
       lualine_y = {
         {
-          LazyVim.lualine.pretty_path(),
+          -- LazyVim.lualine.pretty_path(),
+          function()
+            return vim.fn.expand("%:h")
+          end,
           cond = function()
             local excluded_fts = { "dashboard", "alpha", "ministarter", "toggleterm" }
             return not vim.tbl_contains(excluded_fts, vim.bo.filetype)
@@ -31,24 +34,28 @@ return {
         },
       },
       lualine_z = {
-        function()
-          -- get value of VIRTUAL_ENV variable if it exists
-          local venv = vim.env.VIRTUAL_ENV
-          if venv then
-            -- return only the basename of the path
-            venv = vim.fn.fnamemodify(venv, ":t")
-            return string.format("  %s ", venv)
-          else
-            return ""
-          end
-        end,
+        { "tabs", tab_max_length = 40, mode = 0 },
       },
     }
     -- remove the file icon and pretty_path sections
     -- Note: when we remove 3rd section then 4th section becomes next 3rd so we again need to remmove the same again
     table.remove(opts.sections.lualine_c, 3)
     table.remove(opts.sections.lualine_c, 3)
-    opts.inactive_winbar = {}
+    -- opts.sections.lualine_y = { LazyVim.lualine.root_dir() }
+    opts.sections.lualine_z = {
+      function()
+        -- get value of VIRTUAL_ENV variable if it exists
+        local venv = vim.env.VIRTUAL_ENV
+        if venv then
+          -- return only the basename of the path
+          venv = vim.fn.fnamemodify(venv, ":t")
+          return string.format("  %s ", venv)
+        else
+          return ""
+        end
+      end,
+    }
+
     opts.extensions = { "neo-tree", "lazy" }
     return opts
   end,
