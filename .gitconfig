@@ -51,14 +51,16 @@
     excludesfile = ~/.global_gitignore
     editor = nvim
     pager = delta
+    sshCommand = "ssh -i ~/.ssh/personal_gh_key"
+
 [interactive]
     diffFilter = delta --color-only
 [delta]
     navigate = true    # use n and N to move between diff sections
     ; side-by-side = true
     line-numbers = true
-    line-numbers-left-format = ""
-    line-numbers-right-format = "│ "
+    ; line-numbers-left-format = ""
+    ; line-numbers-right-format = "│ "
 
     # delta detects terminal colors automatically; set one of these to disable auto-detection
     # dark = true
@@ -84,8 +86,11 @@
 	smudge = git-lfs smudge -- %f
 	process = git-lfs filter-process
 	required = true
+
+# work config
 [includeIf "gitdir/i:~/development/work/"]
     path= ~/.linkedin-gitconfig
+
 [rerere]
 	enabled = true
 [push]
