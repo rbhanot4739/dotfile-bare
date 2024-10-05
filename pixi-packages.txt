@@ -1,0 +1,8 @@
+ripgrep
+fzf
+fd-find
+tmux
+nvim
+lazygit
+eza
+git-delta

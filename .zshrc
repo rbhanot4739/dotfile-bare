@@ -104,5 +104,5 @@ alias zi=__zoxide_zi
 [ -f "$HOME/custom_config.zsh" ] && source "$HOME/custom_config.zsh"
 export PATH="$PATH:/Users/rbhanot/.local/bin:/Users/Shared/DBngin/mysql/8.0.19/bin"
 export VOLTA_HOME="$HOME/.volta"
-export PATH="$PATH:$HOME/.cargo/bin:$VOLTA_HOME/bin"
+export PATH="$PATH:$HOME/.cargo/bin:$VOLTA_HOME/bin:$HOME/.pixi/bin"
 
