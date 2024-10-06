@@ -1,10 +1,6 @@
 # vim: set filetype=sh:
 
-export MANPAGER='nvim +Man! -c "set laststatus=0"'
-export BAT_THEME="ansi"
-
 #  =================================== Functions ===================================
-
 get_hidden_files() {
   if [[ $1 == "long" ]]; then
     local params=('--git' '--group' '--group-directories-first' '--time-style=long-iso' '--color-scale=all' '--icons' '--header')
@@ -39,46 +35,6 @@ add_to_zsh_history() {
   print -s $@
 }
 
-# manage_tmux_sessions() {
-#
-#   header="Press enter to create new session if one doesn't exist with same name, delete to kill existing session\n"
-#   fzf_binds='enter:accept-or-print-query,delete:become(tmux kill-session -t {})'
-#   fzf_cmd="fzf  --height 50% --margin=10%,40%,10%,10% --reverse --border=rounded --border-label='Select session to manage'  --color=label:green:bold --color=border:green  --bind \"$fzf_binds\" --color=header:yellow:Italic --header \"$header\""
-#
-#   inside_tmux() {
-#     if [[ -n "$1" ]]; then
-#       tmux switch-client -t "$1" 2>/dev/null || tmux new-session -d -s "$1" && tmux switch-client -t "$1"
-#       return
-#     else
-#       sess_list=$(tmux list-sessions -F "#{session_name}" 2>/dev/null)
-#       session=$(echo -n -e "$sess_list" | eval "$fzf_cmd")
-#       if [[ -n $session ]]; then
-#         # echo "WIll try to attach or create $session"
-#         tmux switch-client -t "$session" 2>/dev/null || tmux new-session -d -s "$session" && tmux switch-client -t "$session"
-#       fi
-#     fi
-#   }
-#
-#   outside_tmux() {
-#     if [[ -n "$1" ]]; then
-#       # if an argument is supplied try attaching to that session if exists else create a new one but do NOT attach to it
-#       tmux attach-session -t "$1" 2>/dev/null || tmux new-session -s "$1"
-#       return
-#     else
-#       sess_list=$(tmux list-sessions -F "#{session_name}" 2>/dev/null)
-#       session=$(echo -n "$sess_list" | eval "$fzf_cmd")
-#       if [[ -n $session ]]; then
-#         # echo "WIll try to attach or create $session"
-#         tmux attach-session -t "$session" || tmux new-session -s "$session"
-#       else
-#         tmux new-session -s "default"
-#       fi
-#
-#     fi
-#
-#   }
-# }
-#
 mx() {
   /bin/bash $HOME/tmux-sessions.sh $@
   # manage_tmux_sessions $@

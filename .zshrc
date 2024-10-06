@@ -1,5 +1,5 @@
 # vim: ft=sh
-#
+
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
@@ -16,12 +16,16 @@ if [[ -f "/opt/homebrew/bin/brew" ]]; then
   eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
 
-zinit ice depth=1; zinit light romkatv/powerlevel10k
+zinit ice wait lucid
+zinit ice depth=1; zinit load romkatv/powerlevel10k
 
-zinit light zdharma-continuum/fast-syntax-highlighting
-zinit light zsh-users/zsh-completions
-zinit light zsh-users/zsh-autosuggestions
-zinit light zsh-users/zsh-history-substring-search
+zinit ice wait lucid
+zinit load zdharma-continuum/fast-syntax-highlighting
+zinit ice wait lucid
+zinit load zsh-users/zsh-completions
+zinit ice wait lucid
+zinit load zsh-users/zsh-autosuggestions
+zinit load zsh-users/zsh-history-substring-search
 
 autoload -Uz compinit && compinit
 # fpath=(~/zsh_functions $fpath);
@@ -31,13 +35,14 @@ autoload -Uz compinit && compinit
 # Enable colors
 autoload -U colors && colors
 
-zinit light Aloxaf/fzf-tab
+zinit ice wait lucid
+zinit load Aloxaf/fzf-tab
 
 # History
-HISTSIZE=100000
-HISTFILE=~/.zsh_history
-SAVEHIST=$HISTSIZE
-HISTDUP=erase
+export HISTSIZE=100000
+export HISTFILE=~/.zsh_history
+export SAVEHIST=$HISTSIZE
+export HISTDUP=erase
 
 # Append history to the history file, rather than overwriting it
 setopt append_history
@@ -50,6 +55,12 @@ setopt hist_reduce_blanks # remove blanks from history items
 setopt inc_append_history # save history entries as soon as they are entered
 setopt hist_save_no_dups # Do not save duplicate commands in the history
 setopt hist_find_no_dups # Do not display duplicate commands when searching the history
+
+if [[ `uname -a` == *Darwin* ]]; then
+  eval $(gdircolors -b)
+  else
+    eval $(dircolors -b)
+fi
 
 # Completion styling
 zstyle ':completion:::::' completer _expand _complete _ignored _approximate
@@ -105,4 +116,6 @@ alias zi=__zoxide_zi
 export PATH="$PATH:/Users/rbhanot/.local/bin:/Users/Shared/DBngin/mysql/8.0.19/bin"
 export VOLTA_HOME="$HOME/.volta"
 export PATH="$PATH:$HOME/.cargo/bin:$VOLTA_HOME/bin:$HOME/.pixi/bin"
+
+# added a comment
 
