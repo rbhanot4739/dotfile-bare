@@ -7,7 +7,7 @@
 # THIS IS THE WORKING VERSION OF THE SCRIPT
 
 del_confirm_header="--header 'Are you sure you want to kill session {}'"
-del_bind="del:become:([[ \\\$(echo -e 'Yes\nNo' | fzf  $del_confirm_header) == 'Yes' ]] && tmux kill-session -t {} )"
+del_bind="del:become:([[ \\\$(echo 'Yes\nNo' | fzf  $del_confirm_header) == 'Yes' ]] && tmux kill-session -t {} )"
 fzf_binds='enter:accept-or-print-query'
 info="--info=hidden"
 border_label="--border-label='Tmux Session Manager'"

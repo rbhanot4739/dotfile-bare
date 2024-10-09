@@ -131,14 +131,14 @@ source ~/.temporal.zsh
 source <(fzf --zsh)
 # eval "$(direnv hook zsh)"
 eval "$(zoxide init zsh)"
+eval "$(devbox global shellenv)"
 alias zi=__zoxide_zi
 
 [ -f "$HOME/fzf_config.zsh" ] && source "$HOME/"fzf_config.zsh
 [ -f "$HOME/custom_config.zsh" ] && source "$HOME/custom_config.zsh"
 export PATH="$PATH:/Users/rbhanot/.local/bin:/Users/Shared/DBngin/mysql/8.0.19/bin"
 export VOLTA_HOME="$HOME/.volta"
-export PATH="$PATH:$HOME/.cargo/bin:$VOLTA_HOME/bin:$HOME/.pixi/bin"
+export PATH="$PATH:$HOME/.cargo/bin:$VOLTA_HOME/bin"
 
 source ~/powerlevel10k/powerlevel10k.zsh-theme
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-
