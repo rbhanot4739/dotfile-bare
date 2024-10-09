@@ -75,8 +75,8 @@ return {
       mappings = {
         add = ";;",
         delete = ";d",
-        find = ";f",
-        find_left = ";F",
+        find = ";>",
+        find_left = ";<",
         highlight = ";h",
         replace = ";r",
         update_n_lines = ";n",

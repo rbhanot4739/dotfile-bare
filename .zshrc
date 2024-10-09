@@ -1,68 +1,102 @@
-# vim: ft=sh
+echo -ne '\e[5 q'    # use beam shape cursor
+(( ${+commands[direnv]} )) && emulate zsh -c "$(direnv export zsh)"
 
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
-# bootstrap zinit
-ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
-[ ! -d $ZINIT_HOME ] && mkdir -p "$(dirname $ZINIT_HOME)"
-[ ! -d $ZINIT_HOME/.git ] && git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
-source "${ZINIT_HOME}/zinit.zsh"
+(( ${+commands[direnv]} )) && emulate zsh -c "$(direnv hook zsh)"
 
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+CUSTOM_COMPLETION_DIR="$HOME/zsh_completions"
+
+# Add the custom completion directory to fpath
+fpath=($CUSTOM_COMPLETION_DIR $fpath)
+autoload -Uz compinit
+compinit
 
 if [[ -f "/opt/homebrew/bin/brew" ]]; then
   eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
 
-zinit ice wait lucid
-zinit ice depth=1; zinit load romkatv/powerlevel10k
-
-zinit ice wait lucid
-zinit load zdharma-continuum/fast-syntax-highlighting
-zinit ice wait lucid
-zinit load zsh-users/zsh-completions
-zinit ice wait lucid
-zinit load zsh-users/zsh-autosuggestions
-zinit load zsh-users/zsh-history-substring-search
-
-autoload -Uz compinit && compinit
-# fpath=(~/zsh_functions $fpath);
-# export export FPATH=$FPATH
-# autoload -U $fpath[1]/*(.:t)
-
 # Enable colors
 autoload -U colors && colors
 
-zinit ice wait lucid
-zinit load Aloxaf/fzf-tab
+# needed specifically for Lazygit and more generically this makes configs more Linux compatible
+export XDG_CONFIG_HOME="$HOME/.config"
+export LANG=en_US.UTF-8
+export LC_CTYPE=en_US.UTF-8
+if [[ $(command -v nvim) ]]; then
+ export EDITOR=nvim
+ export MANPAGER='nvim +Man! -c "set laststatus=0"'
+fi
+export BAT_THEME="ansi"
 
-# History
+# ======== History ========
 export HISTSIZE=100000
 export HISTFILE=~/.zsh_history
 export SAVEHIST=$HISTSIZE
 export HISTDUP=erase
 
-# Append history to the history file, rather than overwriting it
-setopt append_history
-
-
-setopt hist_ignore_space # Ignore commands that start with a space in the history
+setopt append_history       # Append history to the history file, rather than overwriting it
+setopt hist_ignore_space    # Ignore commands that start with a space in the history
 setopt hist_ignore_all_dups # remove older duplicate entries from history
-setopt share_history # share history between different instances of the shell
-setopt hist_reduce_blanks # remove blanks from history items
-setopt inc_append_history # save history entries as soon as they are entered
-setopt hist_save_no_dups # Do not save duplicate commands in the history
-setopt hist_find_no_dups # Do not display duplicate commands when searching the history
+setopt share_history        # share history between different instances of the shell
+setopt hist_reduce_blanks   # remove blanks from history items
+setopt inc_append_history   # save history entries as soon as they are entered
+setopt hist_save_no_dups    # Do not save duplicate commands in the history
+setopt hist_find_no_dups    # Do not display duplicate commands when searching the history
 
-if [[ `uname -a` == *Darwin* ]]; then
-  eval $(gdircolors -b)
+# ======== Plugin mgmt ========
+load_plugins() {
+  # install/load plugins
+  PLUGIN_DIR="$HOME/.zsh/plugins"
+  if [[ ! -d "$PLUGIN_DIR" ]]; then
+    mkdir -p "$PLUGIN_DIR"
+  fi
+
+  PLUGINS=(
+    zdharma-continuum/fast-syntax-highlighting 
+    zsh-users/zsh-autosuggestions 
+    zsh-users/zsh-completions 
+    zsh-users/zsh-history-substring-search 
+    Aloxaf/fzf-tab
+    jeffreytse/zsh-vi-mode
+  )
+  for plugin in $PLUGINS
+  do
+    local plugin_name=`basename $plugin`
+    local plugin_path="${PLUGIN_DIR}/$plugin_name"
+  if [[ ! -d "$plugin_path" ]]; then
+    # echo "will clone https://github.com/$plugin at $plugin_path"
+    git clone https://github.com/$plugin  "$plugin_path"
   else
-    eval $(dircolors -b)
+    # echo "$plugin is already installed...at $plugin_path"
+    source "$plugin_path/$plugin_name.plugin.zsh"
+  fi
+  done
+}
+load_plugins
+
+ZVM_VI_EDITOR="vim"
+
+# The plugin will auto execute this zvm_after_init function
+function zvm_after_init() {
+  [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+bindkey "" forward-word    # ctrl + right
+bindkey "" backward-word   # ctrl + left
+bindkey '^[[A' history-substring-search-up    # up
+bindkey '^[[B' history-substring-search-down # down
+}
+# ======== Completion ========
+# setup directory colors
+# on Mac the command is gdircolors, on Linux it's dircolors
+if command -v gdircolors &> /dev/null; then
+  eval $(gdircolors -b)
+elif command -v dircolors &> /dev/null; then
+  eval $(dircolors -b)
 fi
 
-# Completion styling
 zstyle ':completion:::::' completer _expand _complete _ignored _approximate
 # zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
 zstyle ':completion:*' matcher-list '' 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
@@ -77,39 +111,27 @@ zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'ls --color $realpath'
 # NOTE: fzf-tab does not follow FZF_DEFAULT_OPTS
 zstyle ':fzf-tab:*' fzf-flags --height ~40% --color=fg:1,fg+:2
 
-# Change cursor shape to beam
-echo -ne '\e[5 q'
 
+# ======== Setup key bindings ========
 bindkey -e
 bindkey '^A' beginning-of-line
 bindkey '^E' end-of-line
-bindkey "^[[1;5C" forward-word
-bindkey "^[[1;5D" backward-word
-bindkey '^[[A' history-substring-search-up
-bindkey '^[[B' history-substring-search-down
-
-export LANG=en_US.UTF-8
-export LC_CTYPE=en_US.UTF-8
-[[ $(command -v nvim) ]] && export EDITOR=nvim
-
-# needed specifically for Lazygit and more generically this makes configs more Linux compatible
-export XDG_CONFIG_HOME="$HOME/.config"
-# load custom aliases and functions
 
 
-# dotfiles management
+# ======== Dotfiles mgmt ========
 # git init --bare $HOME/dotfiles
 # alias dconf='/usr/bin/git --git-dir=$HOME/dotfiles/ --work-tree=$HOME'
 # dconf config --local status.showUntrackedFiles no
 # echo "alias dconf='/usr/bin/git --git-dir=$HOME/dotfiles/ --work-tree=$HOME'" >> $HOME/.bashrc
 alias dconf='/usr/bin/git --git-dir=/Users/rbhanot/dotfiles/ --work-tree=$HOME'
-# load tools
+
+
+# ======== Load tools ========
 source ~/.temporal.zsh
 source <(fzf --zsh)
-eval "$(direnv hook zsh)"
+# eval "$(direnv hook zsh)"
 eval "$(zoxide init zsh)"
 alias zi=__zoxide_zi
-
 
 [ -f "$HOME/fzf_config.zsh" ] && source "$HOME/"fzf_config.zsh
 [ -f "$HOME/custom_config.zsh" ] && source "$HOME/custom_config.zsh"
@@ -117,5 +139,6 @@ export PATH="$PATH:/Users/rbhanot/.local/bin:/Users/Shared/DBngin/mysql/8.0.19/b
 export VOLTA_HOME="$HOME/.volta"
 export PATH="$PATH:$HOME/.cargo/bin:$VOLTA_HOME/bin:$HOME/.pixi/bin"
 
-# added a comment
+source ~/powerlevel10k/powerlevel10k.zsh-theme
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 

@@ -13,7 +13,7 @@ local find_files_cmd="$find_all_cmd --type file "
 local find_dirs_cmd="$find_all_cmd --type directory "
 
 local fzf_colors="--color=bg+:#313244,bg:#1e1e2e,spinner:#f5e0dc,hl:#f38ba8 --color=fg:#cdd6f4,header:#f38ba8,info:#cba6f7,pointer:#f5e0dc --color=marker:#b4befe,fg+:#cdd6f4,prompt:#cba6f7,hl+:#f38ba8 --color=selected-bg:#45475a"
-export FZF_DEFAULT_OPTS=" --height 70% --tmux center,90%,60% --layout=reverse --border rounded --multi '--bind=shift-tab:up,tab:down,ctrl-space:toggle' $fzf_colors" # Starts fzf in lower half of the screen taking 40% height
+export FZF_DEFAULT_OPTS=" --height 50% --margin 1,2 --layout=reverse --border rounded --multi '--bind=shift-tab:up,tab:down,ctrl-space:toggle' $fzf_colors" # Starts fzf in lower half of the screen taking 40% height
 
 # if [[ $TMUX ]]; then
 #   export FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS --tmux bottom,50%"
@@ -51,6 +51,11 @@ fzf_all() {
 zle -N fzf_all
 bindkey '^T' fzf_all
 
+# fuzzy search through man pages with tldr preview
+fman() {
+  fd -t f . --follow /usr/share/man/ /opt/homebrew/share/man/ | awk -F '/' '{print $NF}' | awk -F '.' '{print $1}' | fzf --layout reverse --prompt '∷ ' --pointer ▶ --marker ⇒ --height 70% --border=double --preview 'tldr --color {} 2>/dev/null' | xargs man
+}
+
 # fuzzy searching functions
 
 function frg() {
@@ -74,6 +79,10 @@ function frg() {
     --bind 'enter:become($EDITOR {1} +{2})'
 }
 
+add_to_zsh_history() {
+
+  print -s $@
+}
 v() {
   # Opens files or directories using the default editor.
   #
@@ -128,4 +137,13 @@ v() {
   fi
 
   [[ ! -z $selected_files ]] && echo $selected_files && add_to_zsh_history "${EDITOR} ${selected_files}" && ${EDITOR} "${selected_files}" || return 1
+}
+
+gbf() {
+  local branch=$(git branch | fzf --tmux left,30%,30% --bind "enter:accept-or-print-query" | tr -d ' ')
+  git checkout $branch 2>/dev/null || git checkout -b $branch
+}
+
+gbfa() {
+  git checkout $(git branch --all | fzf)
 }

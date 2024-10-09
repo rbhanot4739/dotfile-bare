@@ -31,10 +31,6 @@ debug_print() {
   fi
 }
 
-add_to_zsh_history() {
-  print -s $@
-}
-
 mx() {
   /bin/bash $HOME/tmux-sessions.sh $@
   # manage_tmux_sessions $@
@@ -63,20 +59,11 @@ cd_up() {
   cd $pth
 }
 
-gbf() {
-  local branch=$(git branch | fzf --bind "enter:accept-or-print-query" | tr -d ' ')
-  git checkout $branch 2>/dev/null || git checkout -b $branch
-}
-
-gbfa() {
-  git checkout $(git branch --all | fzf)
-}
-
 #  =================================== Aliases ===================================
 
 # fi
 
-alias fman="fd -t f . --follow /usr/share/man/ /opt/homebrew/share/man/ | fzf --layout reverse --prompt '∷ ' --pointer ▶ --marker ⇒ --delimiter '/' --with-nth=-1 --height 40% --border=double | xargs man"
+# alias fman="fd -t f . --follow /usr/share/man/ /opt/homebrew/share/man/ | fzf --layout reverse --prompt '∷ ' --pointer ▶ --marker ⇒ --delimiter '/' --with-nth=-1 --height 40% --border=double | xargs man"
 alias m="mint "
 alias mf="mint format"
 alias mb="mint build"

@@ -48,7 +48,8 @@ tmux_attach_start() {
     # its a new session that user has entered as query, so lets create and switch to it
     if [[ "$mode" == "term" ]]; then
       echo -n "No existing session found with name $session. Do you want to create a new session? (Y/n): "
-      read -r response
+      read -r -n 1 response
+      response=${response:-Y}
       if [[ "$response" =~ ^[Yy]$ ]]; then
         tmux new-session -d -s "$1" && tmux "$tmux_action" -t "$session"
       else

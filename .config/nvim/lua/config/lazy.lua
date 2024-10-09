@@ -23,7 +23,7 @@ require("lazy").setup({
       "LazyVim/LazyVim",
       import = "lazyvim.plugins",
       opts = {
-        colorscheme = "catppuccin",
+        -- colorscheme = "catppuccin",
         -- colorscheme = "tokyonight",
         icons = {
           kinds = config_utils.icons.kinds,
@@ -55,6 +55,7 @@ require("lazy").setup({
     { import = "lazyvim.plugins.extras.util.octo" },
     { import = "lazyvim.plugins.extras.util.project" },
     -- { import = "lazyvim.plugins.extras.editor.mini-move" },
+    { import = "disabled" },
     -- import/override with your plugins
     { import = "plugins" },
   },

@@ -14,24 +14,24 @@ return {
       pydap.setup(LazyVim.get_pkg_path("debugpy", "/venv/bin/python"))
       pydap.test_runner = "pytest"
     end,
-    keys = {
-      {
-        "<leader>dtm",
-        function()
-          require("dap-python").test_method()
-        end,
-        desc = "[M]ethod",
-        ft = "python",
-      },
-      {
-        "<leader>dtc",
-        function()
-          require("dap-python").test_class()
-        end,
-        desc = "[C]lass",
-        ft = "python",
-      },
-    },
+    -- keys = {
+    --   {
+    --     "<leader>dtm",
+    --     function()
+    --       require("dap-python").test_method()
+    --     end,
+    --     desc = "[M]ethod",
+    --     ft = "python",
+    --   },
+    --   {
+    --     "<leader>dtc",
+    --     function()
+    --       require("dap-python").test_class()
+    --     end,
+    --     desc = "[C]lass",
+    --     ft = "python",
+    --   },
+    -- },
   },
   -- Don't mess up DAP adapters provided by nvim-dap-python
   -- {

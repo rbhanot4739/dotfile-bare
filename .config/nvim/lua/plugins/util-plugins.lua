@@ -44,4 +44,15 @@ return {
       easing = "cube",
     },
   },
+  -- {
+  --   "Bekaboo/deadcolumn.nvim",
+  --   opts = {
+  --     mode = { "n", "i", "v" },
+  --     warning = {
+  --       alpha = 0.4,
+  --       colorcode = "#FF0000",
+  --       hlgroup = { "Error", "bg" },
+  --     },
+  --   },
+  -- },
 }
