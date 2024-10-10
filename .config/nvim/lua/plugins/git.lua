@@ -29,7 +29,6 @@ return {
         end,
       },
     },
-    lazy = false,
     keys = {
       { "<leader>gd", "<cmd>DiffviewOpen<CR>", desc = "Open Diffview" },
       { "<leader>gf", "<cmd>DiffviewFileHistory %<cr>", desc = "Open history for current File" },

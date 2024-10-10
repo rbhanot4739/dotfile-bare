@@ -8,12 +8,30 @@ fi
 (( ${+commands[direnv]} )) && emulate zsh -c "$(direnv hook zsh)"
 
 
+cd_up_widget() {
+  cd ..
+  zle reset-prompt
+  zle accept-line
+}
+
+# Create the widget
+zle -N cd_up_widget
+bindkey '^U' cd_up_widget
+
 CUSTOM_COMPLETION_DIR="$HOME/zsh_completions"
 
 # Add the custom completion directory to fpath
 fpath=($CUSTOM_COMPLETION_DIR $fpath)
 autoload -Uz compinit
 compinit
+
+# _vim_completion() {
+#   # Use the _files builtin to generate file completions only, excluding directories
+#   _path_files -W "$PWD" "*(.)"
+# }
+#
+# # Associate the completion function with the vim command
+# compdef _vim_completion vim
 
 if [[ -f "/opt/homebrew/bin/brew" ]]; then
   eval "$(/opt/homebrew/bin/brew shellenv)"
@@ -82,7 +100,7 @@ ZVM_VI_EDITOR="vim"
 
 # The plugin will auto execute this zvm_after_init function
 function zvm_after_init() {
-  [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+  source <(fzf --zsh)
 bindkey "" forward-word    # ctrl + right
 bindkey "" backward-word   # ctrl + left
 bindkey '^[[A' history-substring-search-up    # up
@@ -127,18 +145,20 @@ alias dconf='/usr/bin/git --git-dir=/Users/rbhanot/dotfiles/ --work-tree=$HOME'
 
 
 # ======== Load tools ========
-source ~/.temporal.zsh
-source <(fzf --zsh)
+eval "$(devbox global shellenv)" 2> /dev/null
+[[ -f "~/.temporal.zsh" ]] && source ~/.temporal.zsh
+# source <(fzf --zsh)
 # eval "$(direnv hook zsh)"
 eval "$(zoxide init zsh)"
-eval "$(devbox global shellenv)"
 alias zi=__zoxide_zi
 
 [ -f "$HOME/fzf_config.zsh" ] && source "$HOME/"fzf_config.zsh
 [ -f "$HOME/custom_config.zsh" ] && source "$HOME/custom_config.zsh"
-export PATH="$PATH:/Users/rbhanot/.local/bin:/Users/Shared/DBngin/mysql/8.0.19/bin"
-export VOLTA_HOME="$HOME/.volta"
-export PATH="$PATH:$HOME/.cargo/bin:$VOLTA_HOME/bin"
+
+export PATH="$PATH:$HOME/.local/bin:"
+[[ -d /Users/Shared/DBngin/ ]] && export PATH="$PATH:/Users/Shared/DBngin/mysql/8.0.19/bin"
+[[ -d $HOME/.volta ]] && export VOLTA_HOME="$HOME/.volta/bin"
+[[ -d $HOME/.cargo ]] && export PATH="$PATH:$HOME/.cargo/bin"
 
 source ~/powerlevel10k/powerlevel10k.zsh-theme
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
